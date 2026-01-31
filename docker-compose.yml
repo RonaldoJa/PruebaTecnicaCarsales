@@ -1,0 +1,37 @@
+services:
+  # Backend - .NET 8 API
+  backend:
+    build:
+      context: ./PruebaTecnicaCarsalesBackEnd
+      dockerfile: Dockerfile
+    container_name: carsales-backend
+    ports:
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5001
+    networks:
+      - carsales-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/episodes"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend - Angular App
+  frontend:
+    build:
+      context: ./PruebaTecnicaCarsalesFrontEnd
+      dockerfile: Dockerfile
+    container_name: carsales-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - carsales-network
+
+networks:
+  carsales-network:
+    driver: bridge
